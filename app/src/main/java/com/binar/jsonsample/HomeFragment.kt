@@ -6,7 +6,10 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.fragment.findNavController
+import com.binar.jsonsample.data.AdminRegister
 import com.binar.jsonsample.databinding.FragmentHomeBinding
+import com.binar.jsonsample.model.RegisterResponseItem
 import com.binar.jsonsample.model.getAllCarResponseItem
 import com.binar.jsonsample.service.ApiClient
 import com.binar.jsonsample.service.MainAdapter
@@ -32,6 +35,11 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         fetchData()
+
+
+        binding.floatingActionButton.setOnClickListener {
+            findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToRegisterFragment())
+        }
     }
 
     private fun fetchData(){
@@ -50,10 +58,7 @@ class HomeFragment : Fragment() {
                         }else{
                             binding.progressBar2.visibility= View.GONE
                         }
-
-
                 }
-
                 override fun onFailure(call: Call<List<getAllCarResponseItem>>, t: Throwable) {
                     Log.d("home", "fail")
                 }
@@ -70,4 +75,5 @@ class HomeFragment : Fragment() {
             adapter.submitData(data)
             binding.recycleview.adapter = adapter
         }
+
 }
