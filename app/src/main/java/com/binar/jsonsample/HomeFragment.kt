@@ -7,21 +7,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
-import com.binar.jsonsample.data.AdminRegister
+import com.binar.jsonsample.Presenter.GetAllCarsContract
+import com.binar.jsonsample.Presenter.GetAllCarsPresenter
 import com.binar.jsonsample.databinding.FragmentHomeBinding
-import com.binar.jsonsample.model.RegisterResponseItem
 import com.binar.jsonsample.model.getAllCarResponseItem
-import com.binar.jsonsample.service.ApiClient
 import com.binar.jsonsample.service.MainAdapter
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 
-class HomeFragment : Fragment() {
+class HomeFragment : Fragment() ,GetAllCarsContract.viewInterface{
+//    private val viewModel : MainViewModel by activityViewModels()
     private var _binding : FragmentHomeBinding?=null
     private val binding : FragmentHomeBinding get() = _binding!!
-
+    private var code: Int = 0
+    private var presenter= GetAllCarsPresenter(this)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,46 +32,37 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        fetchData()
 
 
+        presenter?.getAllCars()
         binding.floatingActionButton.setOnClickListener {
             findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToRegisterFragment())
         }
     }
 
-    private fun fetchData(){
-        ApiClient.instance.getAllCar()
-            .enqueue(object : Callback<List<getAllCarResponseItem>>{
-                override fun onResponse(
-                    call: Call<List<getAllCarResponseItem>>,
-                    response: Response<List<getAllCarResponseItem>>
-                ) {
-
-                        val body = response.body()
-                        val code = response.code()
-                        if (code==200){
-                            binding.progressBar2.visibility= View.GONE
-                            showList(body)
-                        }else{
-                            binding.progressBar2.visibility= View.GONE
-                        }
-                }
-                override fun onFailure(call: Call<List<getAllCarResponseItem>>, t: Throwable) {
-                    Log.d("home", "fail")
-                }
-
-
-            })
+    override fun showResult(result: List<getAllCarResponseItem>?) {
+        Log.d("testingg", result.toString())
+        showList(result)
     }
-        private fun showList(data : List<getAllCarResponseItem>?){
-            val adapter = MainAdapter(object : MainAdapter.OnClickListener{
-                override fun onClickItem(data: getAllCarResponseItem) {
-                }
 
-            })
-            adapter.submitData(data)
-            binding.recycleview.adapter = adapter
+    override fun showCode(code: Int) {
+        Log.d("testing", code.toString())
+        if (code==200){
+            binding.progressBar2.visibility=View.GONE
         }
+    }
+
+
+    private fun showList(data : List<getAllCarResponseItem>?) {
+
+    val adapter = MainAdapter(object : MainAdapter.OnClickListener {
+        override fun onClickItem(data: getAllCarResponseItem) {
+        }
+
+    })
+    adapter.submitData(data)
+    binding.recycleview.adapter = adapter
+}
+
 
 }
